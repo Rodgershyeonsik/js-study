@@ -83,7 +83,6 @@ for( let obj of visitsCountMap.keys()){
 
 // 예제: 사용자의 사이트 방문 여부를 추척용도로 위크셋 사용
 let visitedWeakSet = new WeakSet();
-let visitedSet = new Set();
 
 let harry = { name: 'harry' };
 let ron = { name: 'ron' };
@@ -91,14 +90,18 @@ let hermione = { name: 'hermione'};
 
 visitedWeakSet.add(harry);
 visitedWeakSet.add(ron);
-visitedWeakSet.add(harry);
-
-visitedSet.add(harry);
+visitedWeakSet.add(harry); // 재방문은 무시됨
 
 console.log(visitedWeakSet.has(harry)); // true
 console.log(visitedWeakSet.has(hermione)); // false
 
 harry = null;
 
-console.log(visitedSet.size); // 1, Set에선 살아있음
-console.log(visitedWeakSet.has(harry)); // false, harry를 나타내는 객체가 자동으로 삭제
+// visitedWeakSet에서 harry를 나타내는 객체가 gc에 의해 언젠가는 삭제됨
+
+// 요약
+// 위크맵, 위크셋 모두 구성 요소 전체를 대상으로 하는 메서드는 지원하지 않음
+// 객체엔 주요 자료를, 위크맵과 위크셋엔 부수적인 자료를 저장하는 형태로 활용 가능
+// 객체 참조값이 메모리에서 삭제되고, 오로지 위크맵의 키, 위크셋만 해당 객체를 참조하고 있다면
+// 위크맵: 해당 키 객체, 연관 자료 함께 GC됨
+// 위크셋: 해당 객체 GC됨
