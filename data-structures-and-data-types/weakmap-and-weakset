@@ -71,5 +71,34 @@ console.log(`visitsCountWeakMapSize: ${visitsCountWeakMap.size}`); // peter 객�
 console.log(`visitsCountMapSize: ${visitsCountMap.size}`); // 여전히 visitsCountMap이 살아있음
 
 for( let obj of visitsCountMap.keys()){
-    console.log(JSON.stringify(obj)); // {"name":"peter"}
+    console.log(JSON.stringify(obj)); // {"name":"peter"} 객체도 살아있음
 }
+
+
+// 위크셋(WeakSet)
+// 셋과 유사하지만 객체만 저장할 수 있음
+// 도달 가능한 때에만 메모리에서 유지
+// add, has, delete 사용 가능
+// size, keys 사용 불가
+
+// 예제: 사용자의 사이트 방문 여부를 추척용도로 위크셋 사용
+let visitedWeakSet = new WeakSet();
+let visitedSet = new Set();
+
+let harry = { name: 'harry' };
+let ron = { name: 'ron' };
+let hermione = { name: 'hermione'};
+
+visitedWeakSet.add(harry);
+visitedWeakSet.add(ron);
+visitedWeakSet.add(harry);
+
+visitedSet.add(harry);
+
+console.log(visitedWeakSet.has(harry)); // true
+console.log(visitedWeakSet.has(hermione)); // false
+
+harry = null;
+
+console.log(visitedSet.size); // 1, Set에선 살아있음
+console.log(visitedWeakSet.has(harry)); // false, harry를 나타내는 객체가 자동으로 삭제
