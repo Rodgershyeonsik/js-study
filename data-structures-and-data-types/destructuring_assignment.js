@@ -127,3 +127,41 @@ console.log(common); // {menu1: 'kimchi', menu2: 'ramen'}
 
 // 올바른 코드. 구조 분해 할당문을 괄호 (...)로 감싸 표현식으로 해석하게 하기
 ({title, width, height} = {title: 'title', width: 300, height: 400});
+
+// 중첩 구조 분해 에제
+let office = {
+    adress: {
+        street: '123 street',
+        city: 'seoul'
+    },
+    members: ['john', 'mary'],
+    extra: true
+};
+
+let {
+    adress: {street, city},
+    members: [member1, member2],
+    company = 'young and rich'
+} = office;
+
+console.log(company); // young and rich
+console.log(street); // 123 street
+console.log(city); // seoul
+console.log(member1); // john
+console.log(member2); // mary
+
+// 구조 분해 할당을 활용해 함수 매개변수로 전달하기
+
+// options는 이렇게 초기화되어있음
+// let options = {
+//   title: "Menu",
+//   width: 100,
+//   height: 200
+// };
+
+function showMenu({title = "Untitled", width = 200, height = 100, items = []}) {
+  console.log( `${title} ${width} ${height}` );
+  console.log( items );
+}
+
+showMenu(options);
