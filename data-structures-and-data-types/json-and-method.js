@@ -170,9 +170,11 @@ let str = '{"title":"Conference","date":"2017-11-30T12:00:00.000Z"}';
 let meetup2 = JSON.parse(str);
 
 // console.log( meetup.date.getDate() ) // 에러!
+// riviver에 key가 date일 때 Date객체를 반환하는 함수를 넘겨주기
+// 이 방식은 중첩 객체에도 적용할 수 있음
 let meetup3 = JSON.parse(str, function(key, value) {
   if (key === 'date') return new Date(value);
   return value;
 });
 
-console.log( meetup.date.getDate() ); // 잘 됨
+console.log( meetup.date.getDate() ); // 잘 됨~
