@@ -44,5 +44,93 @@ function pow3(x, n) {
 // 실행 컨텍스트는 메모리를 차지하므로 재귀 사용 시 메모리 요구사항에 유의
 // 단, 반복문을 쓰면 대개 함수호출 비용(메모리 사용)이 절약됨
 
+// 재귀적 순회(recursive traversal)
+// 예제: 아래와 같이 표현된 company에서 salary의 합 구하기
+let company = {
+  sales: [{
+    name: 'John',
+    salary: 1000
+  }, {
+    name: 'Alice',
+    salary: 1600
+  }],
 
+  development: { // 부서에는 하위 부서가 존재, 더 늘어날 가능성도 있음
+    sites: [{
+      name: 'Peter',
+      salary: 2000
+    }, {
+      name: 'Alex',
+      salary: 1800
+    }],
 
+    internals: [{
+      name: 'Jack',
+      salary: 1300
+    }]
+  }
+};
+
+// 급여 합계를 구해주는 함수
+function sumSalaries(department) {
+    console.log(`current department: ${JSON.stringify(department)}`);
+
+  if (Array.isArray(department)) { // 첫 번째 경우: 부서가 배열로 이루어진 가장 단순한 구조(재귀의 베이스)
+    console.log('is array');
+    return department.reduce((prev, current) => prev + current.salary, 0);
+  } else { // 두 번째 경우
+    console.log('is department');
+    let sum = 0;
+    for (let subdep of Object.values(department)) {
+      console.log(`calling sumSaraleies for subdep: ${JSON.stringify(subdep)}`)
+      sum += sumSalaries(subdep); // 재귀 호출로 각 하위 부서 임직원의 급여 총합을 구함
+      console.log(`after summing salaries of subdep: ${sum}`);
+    }
+    return sum;
+  }
+}
+
+console.log( sumSalaries(company) );
+
+// 재귀적 자료 구조 - 자기 자신의 일부를 복제하는 형태의 자료 구조
+// 예: 위에 정의한 company, HTML, XML 등
+
+// 연결 리스트(linked list)
+// 빠르게 삽입 또는 삭제를 해야할 때 배열 대신 활용 가능
+let list = {
+  value: 1,
+  next: {
+    value: 2,
+    next: {
+      value: 3,
+      next: {
+        value: 4,
+        next: null
+      }
+    }
+  }
+};
+
+// 리스트 쪼개기
+let secondList = list.next.next;
+list.next.next = null;
+
+console.log( JSON.stringify(list) ); // {"value":1,"next":{"value":2,"next":null}}
+console.log( JSON.stringify(secondList) ); // {"value":3,"next":{"value":4,"next":null}}
+
+// 합치기
+list.next.next = secondList;
+
+console.log( JSON.stringify(list) );
+
+// 데이터 교체
+list = {value: "new item", next: list};
+console.log( JSON.stringify(list) ); // {"value: "new item", "next":{"value": 1, "next": {...}}}
+
+// 중간 요소 제거
+list.next = list.next.next;
+console.log( JSON.stringify(list) ); // {"value: "new item", "next":{"value": 2, "next": {...}}}
+
+// 연결 리스트의 치명적 단점은 인덱스만 사용해 요소에 접근할 수 없다는 점
+// n번째 요소에 접근하기 위해 n번 next로 이동 필요
+// 중간에 요소를 삽입 또는 삭제하는 게 불필요할 경우 큐(queue)나 데크(deque)를 사용할 수 있음
