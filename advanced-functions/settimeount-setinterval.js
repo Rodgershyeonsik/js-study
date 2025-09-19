@@ -42,3 +42,46 @@ console.log(timerObj); // 취소 후에도 반환값은 null이 되지 않음
 // setTimeout과 달리 함수를 주기적으로 실행하게 만듦
 let timerObj2 = setInterval(()=> console.log('똑딱'), 2000); // 2초 간격으로 로그
 setTimeout(() => { clearInterval(timerObj2); console.log('정지'); }, 5000); // 5초 후 정지
+
+// 중첩 setTimeout을 이용해 일정 간격을 두고 실행하기
+// setinterval을 사용하는 방법보다 유연함
+let delay = 2000;
+
+let timer = setTimeout(function request() {
+    console.log('...요청 보내기...');
+    let result = Math.random() < 0.5;
+
+    if (!result) {
+        // 요청이 실패했다면 요청 간격 늘리기
+        delay *= 2;
+    }
+
+    if (delay > 10000) {
+        console.log('요청 중지');
+        clearTimeout(timer);
+    }
+
+    timer = setTimeout(request, delay);
+}, delay);
+
+clearTimeout(timer);
+
+// 시간이 걸리는 작업을 주기적으로 실행하는 경우에도 유용한데
+// setInterval은 작업에 소모되는 시간도 지연 간격에 포함되어,
+// 실제 명시한 시간 간격이 아닌 작업 소모 시간에 따라 결정됨
+function heavyTest(label) {
+    let start = new Date();
+    console.log(`[${label}] 시작: ${start.toTimeString()} ${start.getMilliseconds()}`);
+    for (let i = 0; i < 1e9; i++) {}
+    console.log(`[${label}] 끝: 총 ${Date.now() - start}ms`);
+}
+
+// 작업이 100ms 간격으로 태스크 큐에 쌓이지만
+// 작업 시간이 100ms 이상이어서 작업이 끝나자마자 간격 없이 다음 작업이 실행됨
+setInterval(heavyTest, 100, 'setInterval');
+
+// 중첩 setTimeout을 이용하는 방법은 지연 간격을 보장함
+let timer2 = setTimeout(function repeat() {
+    heavyTest('setTimeout');
+    timer2 = setTimeout(repeat, 100);
+}, 100);
