@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>콜백 예제</title>
+</head>
+<body>
+    <h1>콜백 예제</h1>
+    <script>
+        function loadScript(src) {
+            // <script> 태그를 만들고 페이지에 태그를 추가합니다.
+            // 태그가 페이지에 추가되면 src에 있는 스크립트를 로딩하고 실행합니다.
+            let script = document.createElement('script');
+            script.src = src;
+            document.head.append(script);
+        }
+        // loadScript('../script.js'); // 스크립트 로딩이 언제 끝나는지 알 수 없음
+        // newFunction(); // 함수가 존재하지 않는다는 에러 발생!
+
+        // 콜백 기반(callback-based) 비동기 프로그래밍 예제
+        function loadScript2(src, callback) {
+            let script = document.createElement('script');
+            // script 객체의 src속성에 src 할당
+            script.src = src;
+            // 스크립트 파일 로딩이 끝나면 callback 함수를 실행하라는 의미
+            script.onload = () => callback(script);
+            document.head.append(script);
+        }
+        // 제대로 동작
+        loadScript2('../script.js', function() {
+            newFunction();
+        });
+
+        // 콜백 속 콜백
+        // 동작이 많은 경우엔 좋지 않음
+        loadScript2('../script.js', function() {
+            alert('첫 번째 스크립트 로딩 완료');
+
+            loadScript2('../script2.js', function() {
+                alert('두 번째 스크립트 로딩 완료');
+            });
+        });
+
+        // 스크립트 로드 시 에러 핸들링 추가
+        function loadScript3(src, callback) {
+            let script = document.createElement('script');
+            script.src = src;
+            script.onload = () => callback(null, script);
+            script.onerror = () => callback(new Error(`${src}를 불러오다 에러 발생`));
+
+            document.head.append(script);
+        }
+
+        loadScript3('../script.js', function(error, script) {
+            if (error) {
+                // 에러 처리
+                alert('스크립트 로딩 실패');
+            } else {
+                // 스크립트 로딩이 성공적으로 끝났을 때
+                alert('스크립트 로딩 성공');
+            }
+        });
+    </script>
+</body>
+</html>
