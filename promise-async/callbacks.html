@@ -61,6 +61,41 @@
                 alert('스크립트 로딩 성공');
             }
         });
+        // 이런 에러 처리 방식을 오류 우선 콜백(error-first callback)이라고 함
+
+        // 중첩 콜백이 많아지면 호출이 깊어지며 소위 콜백 지옥이 되는데
+        // 각 동작을 독립적인 함수로 만들어 완화할 수 있음
+        loadScript3('../script.js', step1);
+
+        function step1(error, script) {
+            if (error) {
+                handleError(error);
+            } else {
+                // ...
+                loadScript3('../script.js', step2);
+            }
+        }
+
+        function step2(error, script) {
+            if (error) {
+                handleError(error);
+            } else {
+                // ...
+                loadScript3('../script.js', step3);
+             }
+        }
+
+        function step3(error, script) {
+            if (error) {
+                handleError(error);
+            } else {
+                // 모든 스크립트가 로딩되면 다른 동작을 수행합니다. (*)
+            }
+        };
+
+        // 깊은 중첩은 해결되었지만 코드가 찢어져 읽기가 어려움
+        // step*로 명명한 함수들은 오직 중첩 지옥을 피하는 용도로 만들어 재사용 어려움
+        // 이를 피할 가장 좋은 방법은 다음 챕터의 promise를 사용하는 것이다
     </script>
 </body>
 </html>
