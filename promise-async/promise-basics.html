@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>promise basics</title>
+    </head>
+    <body>
+
+    </body>
+        <script>
+            let promise = new Promise(function(resolve, reject) {
+                // executor, 실행자 또는 실행함수. 보통 시간이 걸리는 일(비동기 작업)을 수행
+                // executor는 실행 결과를 얻게 되면 resolve, reject 둘 중 하나를 반드시 호출해야 함
+
+                // resolve, reject는 js 자체 제공 콜백
+                // resolve(value): 일이 성공적으로 끝난 경우 그 결과를 나타내는 value와 함께 호출
+                // reject(error): 에러 발생 시 에러 객체를 나타내는 error와 함께 호출
+                // resolve, reject는 인수를 하나만 받고(또는 받지 않음), 그 외 인수는 무시함
+                
+                // promise 객체는 state, result를 내부 프로퍼티로 가짐
+                // 처음엔 state: pending, result: undefined
+                // resolve 호출 시 state: fulfilled, result: value
+                // reject 호출 시 state: rejected, result: error
+
+                // 1초 뒤 일이 성공적으로 끝났다는 신호가 전달되며, result는 '완료'가 됨
+                setTimeout(() => resolve("완료"), 1000);
+
+                // resolve 또는 reject가 호출되며 변경된 상태는 변하지 않음
+                // 해당 호출은 무시됨
+                setTimeout(() => reject(new Error("...")), 2000);
+                // resolve(123); 즉시 호출할 수도 있음
+            });
+
+            promise.then(
+                result => alert(result), // 프라미스가 이행되었을 때 실행
+                error => alert(error) // 프라미스가 거부되었을 때 실행
+            );
+
+            // 작업이 성공한 경우만 다루 싶을 경우 .then에 인수 하나만 전달
+            promise.then(alert);
+
+            let promise2 = new Promise((resolve, reject) => {
+                setTimeout(reject(new Error('삐용삐용'), 2000));
+            });
+
+            // 에러가 발생한 경우만 다루고 싶은 경우
+            promise2.then(null, alert); // .then(null, errorHandlingFn)
+            promise2.catch(alert);  // .catch(errorHandlingFn)
+
+            // finally(f) 호출은 결과에 상관없이 항상 실행됨
+            // promise의 성공, 실패 여부를 몰라도 되니까 알 수 없음
+            // promise 결과는 finally를 통과해서 전달된다는 특징이 있음
+            new Promise((resolve, reject) => {
+                /* 비동기 작업 후 resolve 또는 reject 호출 */
+            })
+            .finally(() => {console.log('promise가 준비되었따')})
+            .then(result => console.log('result 보여줌'), reject => console.log('에러 보여줌'));
+
+            // 생성과 동시에 이행된 promise3
+            let promise3 = new Promise(resolve => resolve("바로 끝났쥬?"));
+            // 생성과 동시에 이행된 promise3의 핸들러는 즉각 실행됨
+            promise3.then(alert);
+            
+            // callback의 loadScript 함수 예제를 promise를 사용해 다시 작성
+            function loadScript(src){
+                return new Promise((resolve, reject) => {
+                    let script = document.createElement('script');
+                    script.src = src;
+
+                    script.onload = () => resolve(script);
+                    script.onerror = () => reject(new Error(`${src} 불러오다 에러 발생!`));
+
+                    document.head.append(script);
+                });
+            }
+
+            // 사용 예시
+            let promise4 = loadScript('../script.js');
+
+            promise4.then(
+                script => alert(`${script.src}를 불러왔다!`),
+                error => alert(`Error: ${error.message}`)
+            );
+
+            promise4.then(script => alert('또 다른 핸들러...'));
+
+            // promise 사용 시 callback보다 나은 점
+            // 1. 흐름이 자연스러움(스크립트 읽고 결과에 따라 .then에서 뭐할지 코드 작성)
+            // 2. 원하는 만큼 .then 호출 가능. callback은 하나만 가능
+        </script>
+</html>
