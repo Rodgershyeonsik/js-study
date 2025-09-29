@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>async / await</title>
+    </head>
+    <body>
+        <script>
+            // 함수 앞에 async 키워드를 붙이면 해당 함수는 항상 promise를 반환함
+            async function f() {
+                return 1;
+
+                // return Promise.resolve(1); 명시적으로 promise 반환도 가능
+            }
+
+            f().then(alert); // 1
+
+            // await 사용 예제
+            // await은 async 함수 안에서만 동작함
+            async function f2() {
+                let promise = new Promise((resolve, reject) => {
+                    setTimeout(() => resolve('완료!', 1000))
+                });
+
+                let result = await promise; // promise가 이행될 때까지 기다림
+
+                alert(result); // '완료!'
+                return result;
+            }
+
+            f2();
+
+            // 최상위 레벨 코드에서는 익명 async 함수로 코드를 감싸서 await 사용 가능
+            (async () => {
+                let result = await f2();
+                alert('최상위 레벨 코드에서 await 사용: ' + result);
+            })();
+
+            // await promise가 거부되면 throw문을 작성한 것처럼 에러가 던져짐
+            async function f3() {
+                await Promise.reject(new Error("에러 발생!"));
+                // throw new Error('에러 발생!');과 동일하게 동작
+            }
+
+            // try .. catch로 잡기
+            async function f4() {
+                try {
+                    let res = await fetch('http://없는-주소');
+                } catch (error) {
+                    alert(error);
+                }
+            }
+
+            f4();
+
+            // .catch로 잡기
+            (async () => await fetch('http:/그런-주소-없음'))
+                ().catch((error) => alert('catch로 잡기' + error));
+
+            // Promise.all과 await 같이 쓰기 - 여러 개의 promise가 모두 처리되길 기다리는 상황
+            ( async () => { 
+                let result = await Promise.all([
+                        fetch('https://api.github.com/users/iliakan'),
+                        fetch('https://api.github.com/users/Violet-Bora-Lee'),
+                        fetch('https://api.github.com/users/jeresig')
+                        ]);
+
+                        debugger;
+
+                alert('promise.all 끝!');
+            })();
+        </script>
+    </body>
+</html>
